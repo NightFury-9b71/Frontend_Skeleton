@@ -1,14 +1,23 @@
 import './globals.css';
+import LayoutWrapper from '@/components/LayoutWrapper';
+
+
+export const metadata = {
+  title: 'Inventory Dashboard',
+  description: 'A modern dashboard application',
+};
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className='flex justify-center items-center h-screen w-full'>
-        {children}
+      <body>
+        <LayoutWrapper>
+          {children}
+        </LayoutWrapper>
       </body>
     </html>
   );
