@@ -1,64 +1,73 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import { getOffices } from "@/lib/api";
+import { Office } from "@/types/office";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  subject: string;
-}
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
-const StudentCard: React.FC = () => {
-  const [student, setStudent] = useState<Student | null>(null);
+export default function OfficeTablePage() {
+  const [offices, setOffices] = useState<Office[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStudent = async () => {
-      try {
-        const response = await axios.get("http://localhost:8080/hello");
-        setStudent(response.data);
-      } catch (error) {
-        console.error('Error fetching student:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStudent();
+    loadOffices();
   }, []);
 
-  if (loading) return <div className="p-4">Loading...</div>;
-  if (!student) return <div className="p-4">Student not found</div>;
+  const loadOffices = async () => {
+    setLoading(true);
+    try {
+      const data = await getOffices();
+      setOffices(data);
+      console.log("Offices loaded:", data);
+    } catch (err) {
+      console.error("Failed to fetch offices", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className='flex justify-center items-center h-full w-full'>
-      <div className="max-w-sm bg-white rounded-lg shadow-md p-4 border">
-        <div className="mb-3">
-          <h3 className="font-bold text-lg">{student.name}</h3>
-          <p className="text-gray-600">{student.subject}</p>
-        </div>
-        
-        <div className="space-y-2 text-sm">
-          <div>
-            <span className="font-medium">ID:</span> {student.id}
-          </div>
-          <div>
-            <span className="font-medium">Email:</span> {student.email}
-          </div>
-          <div>
-            <span className="font-medium">Phone:</span> {student.phone}
-          </div>
-          <div>
-            <span className="font-medium">Address:</span> {student.address}
-          </div>
-        </div>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Offices</h1>
       </div>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Name_Bn</TableHead>
+              <TableHead>Code</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {offices.map((office) => (
+              <TableRow key={office.id}>
+                <TableCell>{office.name}</TableCell>
+                <TableCell>{office.nameBn}</TableCell>
+                <TableCell>{office.code}</TableCell>
+                <TableCell>{office.type}</TableCell>
+                <TableCell>{office.isActive ? "Active" : "Inactive"}</TableCell>
+            
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
-};
-
-export default StudentCard;
+}
